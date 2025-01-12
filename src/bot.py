@@ -46,9 +46,8 @@ async def help(update, context):
     """Handler for /help command"""
     help_text = (
         "Available commands:\n\n"
-        "/start - Start the bot\n"
         "/help - Show this help message\n"
-        "/list - Show upcoming concerts"
+        "/koncerti - Raspored Koncerata"
     )
     await update.message.reply_text(help_text)
 
@@ -60,7 +59,7 @@ async def list_concerts(update, context):
     try:
         data = load_concerts()
         if not data['concerts']:
-            await update.message.reply_text("No concerts scheduled!")
+            await update.message.reply_text("Nema koncerata u bazi!")
             return
 
         # Sort concerts by date
@@ -73,17 +72,17 @@ async def list_concerts(update, context):
                 upcoming.append(concert)
         
         if not upcoming:
-            await update.message.reply_text("No upcoming concerts!")
+            await update.message.reply_text("Nema koncerata na rasporedu :( ima koji za dodati?")
             return
 
         # Sort by date
         upcoming.sort(key=lambda x: x['date'])
         
         # Format message
-        message = "🎸 *UPCOMING CONCERTS* 🎸\n\n"
+        message = "Evo, da ne zaboravite ;) \n\n 🎸  Koncerti  🎸\n\n"
         for concert in upcoming:
             message += f"`{concert['band']}`\n"
-            message += f"`{concert['date']} at {concert['time']}`\n"
+            message += f"`{concert['date']} u {concert['time']}`\n"
             message += f"`{concert['venue']}`\n"
             message += f"`{concert['ticket']}`\n"
             message += f"{concert['link']}\n"
@@ -95,7 +94,7 @@ async def list_concerts(update, context):
     except Exception as e:
         # Basic error handling - logs the error and notifies user
         logger.error(f"Error in list_concerts: {str(e)}")
-        await update.message.reply_text("Sorry, couldn't get the concert list right now!")
+        await update.message.reply_text("Sorry, nemogu dohvatit raspored")
 
 async def error_handler(update, context):
     """
@@ -104,7 +103,7 @@ async def error_handler(update, context):
     logger.error(f"Bot error: {context.error}")
     if update:
         await update.message.reply_text(
-            "Sorry, something went wrong. Try again later!"
+            "Sorry, nekaj se sj..., javi nevenu"
         )
 
 def main():
@@ -124,7 +123,7 @@ def main():
         # Add command handlers
         app.add_handler(CommandHandler("start", start))
         app.add_handler(CommandHandler("help", help))
-        app.add_handler(CommandHandler("list", list_concerts))
+        app.add_handler(CommandHandler("koncerti", list_concerts))
         
         # Add error handler
         app.add_error_handler(error_handler)
