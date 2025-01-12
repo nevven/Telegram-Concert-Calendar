@@ -89,14 +89,16 @@ async def list_concerts(update, context):
         upcoming.sort(key=lambda x: x['date'])
         
         # Format message
-        message = "Evo, da ne zaboravite ;) \n\n 🎸  Koncerti  🎸\n\n"
+        message = "Evo, da ne zaboravite ;)\n\n\n`🎸   Koncerti   🎸`\n\n"
         for concert in upcoming:
             message += f"`{concert['band']}`\n"
             message += f"`{concert['date']} u {concert['time']}`\n"
             message += f"`{concert['venue']}`\n"
-            message += f"`{concert['ticket']}`\n"
-            message += f"{concert['link']}\n"
-            message += f"──────────────\n"
+            message += f"`Karta: {concert['ticket']}`\n"
+            message += f"{concert['link']}\n"  # No backticks for link
+            message += f"───────────────────\n"  # Removed extra quotes
+
+        message += "\n🤘🏿"
 
         await update.message.reply_text(message, parse_mode='Markdown')
         logger.info(f"User {update.effective_user.username} requested concert list")
