@@ -19,19 +19,29 @@ load_dotenv()
 
 def load_concerts():
     """
-    Load concerts from JSON file. If file doesn't exist, create an empty one.
-    In AWS, this file will be in the same directory as the bot script.
+    Load concerts from the data directory's JSON file.
+    Creates the file with empty concert list if it doesn't exist.
     """
-    json_path = 'koncerti.json'  # Simplified path for AWS
+    # Construct path to data/koncerti.json from any location
+    json_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'koncerti.json')
+    
     try:
+        # Try to read existing concert data
         with open(json_path, 'r', encoding='utf-8') as f:
             return json.load(f)
+            
     except FileNotFoundError:
-        # If file doesn't exist, create a new one with empty concert list
-        logger.info("Concert file not found, creating new one")
+        # If file doesn't exist, create new one with empty concert list
+        logger.info(f"Concert file not found at {json_path}, creating new one")
         data = {"concerts": []}
+        
+        # Make sure data directory exists
+        os.makedirs(os.path.dirname(json_path), exist_ok=True)
+        
+        # Create new empty concerts file
         with open(json_path, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=4)
+            
         return data
 
 async def start(update, context):
