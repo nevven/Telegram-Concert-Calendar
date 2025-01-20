@@ -6,12 +6,24 @@ import logging
 from datetime import datetime
 from telegram.ext import Application, CommandHandler
 
-# Set up basic logging - this will create a log file to help you track any issues
-logging.basicConfig(
-    level=logging.INFO,  # Logs info and errors
-    filename='bot.log',  # All logs will go to this file
-    format='%(asctime)s - %(message)s'  # Timestamp + message format
-)
+# At the start of bot.py
+if os.getenv('ENVIRONMENT') == 'production':
+    # AWS: Use system logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(message)s',
+        handlers=[
+            logging.StreamHandler()
+        ]
+    )
+else:
+    # Local: Use file logging
+    logging.basicConfig(
+        level=logging.INFO,
+        filename='bot.log',
+        format='%(asctime)s - %(message)s'
+    )
+
 logger = logging.getLogger(__name__)  # Create a logger instance
 
 # Load environment variables from .env file
