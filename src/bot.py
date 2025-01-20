@@ -19,8 +19,7 @@ load_dotenv()
 
 def load_concerts():
     """
-    Load concerts from the data directory's JSON file.
-    Creates the file with empty concert list if it doesn't exist.
+    Load concerts from JSON file. Works both locally and on AWS
     """
     # Construct path to data/koncerti.json from any location
 
@@ -37,18 +36,9 @@ def load_concerts():
             return json.load(f)
             
     except FileNotFoundError:
-        # If file doesn't exist, create new one with empty concert list
-        logger.info(f"Concert file not found at {json_path}, creating new one")
-        data = {"concerts": []}
-        
-        # Make sure data directory exists
-        os.makedirs(os.path.dirname(json_path), exist_ok=True)
-        
-        # Create new empty concerts file
-        with open(json_path, 'w', encoding='utf-8') as f:
-            json.dump(data, f, indent=4)
-            
-        return data
+        logger.error(f"Concert file not found at {json_path}")
+        return {"concerts": []}
+
 
 async def start(update, context):
     """Handler for /start command"""
