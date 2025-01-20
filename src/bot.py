@@ -23,7 +23,13 @@ def load_concerts():
     Creates the file with empty concert list if it doesn't exist.
     """
     # Construct path to data/koncerti.json from any location
-    json_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'koncerti.json')
+
+    # Try AWS path first (flat structure)
+    json_path = os.path.join('data', 'koncerti.json')
+
+    # If file not found, try local development path
+    if not os.path.exists(json_path):
+        json_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'koncerti.json')
     
     try:
         # Try to read existing concert data
