@@ -29,27 +29,25 @@ logger = logging.getLogger(__name__)  # Create a logger instance
 # Load environment variables from .env file
 load_dotenv()
 
-def load_concerts():
+def load_data():
     """
-    Load concerts from JSON file. Works both locally and on AWS
+    Load data from JSON file. Works both locally and on AWS
     """
-    # Construct path to data/koncerti.json from any location
-
     # Try AWS path first (flat structure)
-    json_path = os.path.join('data', 'koncerti.json')
+    json_path = os.path.join('data', 'data.json')
 
     # If file not found, try local development path
     if not os.path.exists(json_path):
-        json_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'koncerti.json')
+        json_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'data.json')
     
     try:
-        # Try to read existing concert data
+        # Try to read existing data
         with open(json_path, 'r', encoding='utf-8') as f:
             return json.load(f)
             
     except FileNotFoundError:
-        logger.error(f"Concert file not found at {json_path}")
-        return {"concerts": []}
+        logger.error(f"Data file not found at {json_path}")
+        return {"concerts": [], "albums": []}
 
 
 async def start(update, context):
@@ -65,17 +63,18 @@ async def help(update, context):
     help_text = (
         "Available commands:\n\n"
         "/help - Show this help message\n"
-        "/koncerti - Raspored Koncerata"
+        "/koncerti - Raspored Koncerata\n"
+        "/albumi - Nadolazeći Albumi"
     )
     await update.message.reply_text(help_text)
 
 async def list_concerts(update, context):
     """
-    Handler for /list command
+    Handler for /koncerti command
     Shows all upcoming concerts, sorted by date
     """
     try:
-        data = load_concerts()
+        data = load_data()
         if not data['concerts']:
             await update.message.reply_text("Nema koncerata u bazi!")
             return
@@ -104,7 +103,7 @@ async def list_concerts(update, context):
             message += f"`{concert['venue']}, {concert['city']}`\n"
             message += f"`Karta: {concert['ticket']}`\n"
             message += f"{concert['link']}\n"  # No backticks for link
-            message += f"───────────────────────\n\n"  # Removed extra quotes
+            message += f"───────────────────────\n\n"
 
         message += "\n🤘🏿"
 
@@ -115,6 +114,51 @@ async def list_concerts(update, context):
         # Basic error handling - logs the error and notifies user
         logger.error(f"Error in list_concerts: {str(e)}")
         await update.message.reply_text("Sorry, nemogu dohvatit raspored")
+
+async def list_albums(update, context):
+    """
+    Handler for /albumi command
+    Shows all upcoming album releases, sorted by date
+    """
+    try:
+        data = load_data()
+        if not data.get('albums'):
+            await update.message.reply_text("Nema albuma u bazi!")
+            return
+
+        # Sort albums by date
+        today = datetime.now().date()
+        upcoming = []
+        
+        for album in data.get('albums', []):
+            album_date = datetime.strptime(album['date'], '%Y-%m-%d').date()
+            if album_date >= today:
+                upcoming.append(album)
+        
+        if not upcoming:
+            await update.message.reply_text("Ne izlazi niš, uljenile se guzice, il me neven zaboravio nahranit s podacima")
+            return
+
+        # Sort by date
+        upcoming.sort(key=lambda x: x['date'])
+        
+        # Format message
+        message = "Evo, da i ovo ne zaboravite ;)\n\n\n`⚡    Albumi    ⚡`\n\n"
+        for album in upcoming:
+            message += f"`{album['band']}`\n"
+            message += f"`{album['album']}`\n"
+            message += f"`Izlazi: {album['date']}`\n"
+            message += f"`Label: {album['label']}`\n"
+            message += f"───────────────────────\n\n"
+
+        message += "\n🤘🏿"
+
+        await update.message.reply_text(message, parse_mode='Markdown')
+        logger.info(f"User {update.effective_user.username} requested album list")
+    
+    except Exception as e:
+        logger.error(f"Error in list_albums: {str(e)}")
+        await update.message.reply_text("Sorry, nemogu dohvatit albume")
 
 async def error_handler(update, context):
     """
@@ -144,6 +188,7 @@ def main():
         app.add_handler(CommandHandler("start", start))
         app.add_handler(CommandHandler("help", help))
         app.add_handler(CommandHandler("koncerti", list_concerts))
+        app.add_handler(CommandHandler("albumi", list_albums))
         
         # Add error handler
         app.add_error_handler(error_handler)
