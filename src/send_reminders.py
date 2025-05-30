@@ -8,7 +8,7 @@ from telegram import Bot
 # Configuration
 BOT_TOKEN = "***REMOVED***"
 CHAT_ID = "-198071088"
-REMINDER_DAYS = [30, 7, 1]  
+REMINDER_DAYS = [30, 7, 1]
 
 def load_concert_data():
     """Load concert data from JSON file. Works both locally and on AWS"""
