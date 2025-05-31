@@ -50,22 +50,25 @@ def format_reminder_message(reminder):
     days = reminder['days_until']
     
     # Basic concert info (same for all)
-    message = f"{concert['band']}\n"
-    message += f"{concert['date']} u {concert['time']}\n"
-    message += f"{concert['venue']}, {concert['city']}\n"
-    message += f"Karta: {concert['ticket']}\n\n"
+    message = f"`{concert['band']}`\n"
+    message += f"`{concert['date']} u {concert['time']}`\n"
+    message += f"`{concert['venue']}, {concert['city']}`\n"
+    message += f"`Karta: {concert['ticket']}`\n\n"
     
     # Different messages based on days
     if days == 1:
-        message += "🔥 Koncert je sutra, dobar provod ko ide, ko nejde stara baba\n"
+        message += "🔥 Koncert je sutra, dobar provod ko ide, ko nejde stara baba\n\n"
+        # No link for tomorrow reminders
     elif days == 7:
         message += "🎸 Koncert je za 7 dana, ako još niste kupili karte:\n\n"
+        message += f"{concert['link']}\n\n"
     elif days == 30:
         message += "🎸 Koncert je za mjesec dana, jeste kupili karte?\n\n"
+        message += f"{concert['link']}\n\n"
     else:
         message += f"🎸 Koncert je za {days} dana\n\n"
+        message += f"{concert['link']}\n\n"
     
-    message += f"{concert['link']}\n\n"
     message += "🤘🏿"
     
     return message
