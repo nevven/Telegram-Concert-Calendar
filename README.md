@@ -14,14 +14,16 @@ Uses [python-telegram-bot](https://github.com/python-telegram-bot/python-telegra
 - `/help` - Show help message
 - `/koncerti` - Show upcoming concerts (Raspored Koncerata)
 - `/albumi` - Show upcoming album releases (Nadolazeći Albumi)
-- `/chatid` - Get current chat ID (for setup) # not coded in
+- `/chatid` - Get current chat ID (for setup)
 
 ## Configuration
 
 ### Telegram Settings
-- **Bot Token**: `***REMOVED***`
-- **Main Group Chat ID**: `-198071088`
-- **Test Group Chat ID**: `-4604558871`
+Set the following in a `.env` file:
+```
+TELEGRAM_BOT_TOKEN=your_bot_token
+TELEGRAM_CHAT_ID=your_chat_id
+```
 
 ### Reminder Schedule
 - **30 days before** - "jeste kupili karte?" reminder
@@ -55,7 +57,7 @@ Set up cron job to run reminder checker daily:
 crontab -e
 
 # Add daily reminder at 9:00 AM
-0 9 * * * /usr/bin/python3 /home/ec2-user/telegram-concert-calendar/send_reminders.py
+0 9 * * * /usr/bin/python3 /path/to/telegram-concert-calendar/send_reminders.py
 ```
 
 ## Data Format
@@ -101,4 +103,4 @@ Successfully implemented automatic concert reminders using:
 **Previous attempts with APScheduler and JobQueue were overly complex** - the simple approach works reliably and is easier to maintain.
 
 ### Testing
-Use test group chat ID `-4604558871` for testing reminders without spamming main group.
+Use a test group chat ID (set `TELEGRAM_CHAT_ID` to your test group) for testing reminders without spamming the main group.
