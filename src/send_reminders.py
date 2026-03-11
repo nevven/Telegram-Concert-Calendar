@@ -3,11 +3,14 @@ import json
 import os
 import asyncio
 from datetime import datetime
+from dotenv import load_dotenv
 from telegram import Bot
 
+load_dotenv()
+
 # Configuration
-BOT_TOKEN = "***REMOVED***"
-CHAT_ID = "-198071088"
+BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
+CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 REMINDER_DAYS = [30, 7, 1]
 
 def load_concert_data():
